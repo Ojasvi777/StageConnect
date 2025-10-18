@@ -1,0 +1,140 @@
+/* General Page Styling */
+.profile-page {
+  background-color: #0d0d0d;
+  color: #e0e0e0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+ }
+
+/* --- Top Section (Video + Media Thumbs) --- */
+.top-section {
+  display: flex;
+  gap: 20px;
+  padding: 40px;
+  justify-content: center;
+}
+
+.media-left {
+  flex: 2;
+}
+
+.main-video {
+  background: #1a1a1a;
+  border: 2px solid #8a2be2;
+  height: 250px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #8a2be2;
+}
+
+.media-right {
+  flex: 1;
+  display: grid;
+  gap: 10px;
+}
+
+.thumbnail {
+  background: #1a1a1a;
+  height: 100px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  border: 1px solid #292929;
+}
+
+/* --- About + Attributes --- */
+.about-section {
+  display: flex;
+  gap: 40px;
+  padding: 40px;
+}
+
+.about, .attributes {
+  flex: 1;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.attributes ul {
+  list-style: none;
+  padding: 0;
+}
+
+.attributes li {
+  margin-bottom: 8px;
+}
+
+.attributes strong {
+  color: #8a2be2;
+}
+
+/* --- Representation Section --- */
+.rep-section {
+  display: flex;
+  gap: 20px;
+  padding: 40px;
+}
+
+.rep-card {
+  flex: 1;
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+/* --- Acting Samples --- */
+.samples {
+  padding: 40px;
+}
+
+.sample-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.sample-box {
+  background: #1a1a1a;
+  height: 120px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #292929;
+  color: #b3b3b3;
+  transition: 0.3s;
+}
+
+.sample-box:hover {
+  border-color: #8a2be2;
+  color: #fff;
+}
+
+/* --- Credits --- */
+.credits {
+  padding: 40px;
+}
+
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.credit-col {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.credit-col h3 {
+  color: #8a2be2;
+  margin-bottom: 10px;
+}
