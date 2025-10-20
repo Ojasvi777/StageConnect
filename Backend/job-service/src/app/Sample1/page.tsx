@@ -2,39 +2,22 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+
 export default function Page() {
   return (
     <div className="min-h-screen bg-white text-[#1E1E1E] font-sans">
       {/* NAVBAR */}
-      <nav className="flex justify-between items-center px-10 md:px-20 py-6 border-b border-gray-100 bg-white/70 backdrop-blur-md fixed w-full top-0 z-50">
-        <h1 className="text-3xl font-extrabold text-[#D4AF37] tracking-tight">
-          StageConnect
-        </h1>
-        <div className="space-x-8 text-sm md:text-base font-medium">
-          <a href="#discover" className="hover:text-[#E58BB4] transition">
-            Discover
-          </a>
-          <a href="#stories" className="hover:text-[#E58BB4] transition">
-            Stories
-          </a>
-          <a href="#join" className="hover:text-[#E58BB4] transition">
-            Join
-          </a>
-          <Link href="/login" className="hover:text-[#E58BB4] transition">
-            Login
-          </Link>
-          <Link href="/Findtalent" className="hover:text-[#E58BB4] transition">
-            Find Talent
-          </Link>
-          <Link href="/Profile" className="hover:text-[#E58BB4] transition">
-            Profile
-          </Link>
+      <nav className="flex justify-between items-center px-12 py-6 border-b border-gray-100">
+        <h1 className="text-3xl font-bold text-[#D4AF37]">Starlink</h1>
+        <div className="space-x-8 text-sm font-medium">
+          <a href="#discover" className="hover:text-[#E58BB4] transition">Discover</a>
+          <a href="#stories" className="hover:text-[#E58BB4] transition">Stories</a>
+          <a href="#join" className="hover:text-[#E58BB4] transition">Join</a>
         </div>
       </nav>
 
       {/* HERO SECTION */}
-      <section className="flex flex-col items-center text-center justify-center pt-48 pb-32 px-6 md:px-20 bg-gradient-to-b from-[#FFF8E7] to-white">
+      <section className="flex flex-col items-center text-center mt-32 px-6">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -58,10 +41,7 @@ export default function Page() {
       </section>
 
       {/* FEATURE SECTION */}
-      <section
-        id="discover"
-        className="mt-20 px-6 md:px-20 grid md:grid-cols-3 gap-10"
-      >
+      <section id="discover" className="mt-32 px-6 md:px-20 grid md:grid-cols-3 gap-10">
         {[
           {
             title: "Create Your Profile",
@@ -81,14 +61,11 @@ export default function Page() {
         ].map((f, i) => (
           <motion.div
             key={i}
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: "spring", stiffness: 200 }}
+            whileHover={{ scale: 1.02 }}
             className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 text-center hover:shadow-md transition"
           >
             <div className="text-5xl mb-4">{f.icon}</div>
-            <h3 className="text-xl font-semibold mb-2 text-[#2E2E2E]">
-              {f.title}
-            </h3>
+            <h3 className="text-xl font-semibold mb-2 text-[#2E2E2E]">{f.title}</h3>
             <p className="text-[#6B6B6B]">{f.desc}</p>
           </motion.div>
         ))}
@@ -103,13 +80,11 @@ export default function Page() {
           {[
             {
               name: "Aisha Verma",
-              quote:
-                "I uploaded one short video — and landed my first brand deal. StageConnect changed my trajectory.",
+              quote: "I uploaded one short video — and landed my first brand deal. Starlink changed my trajectory.",
             },
             {
               name: "Rohan Malhotra",
-              quote:
-                "It gave me visibility I never thought possible. The dream started to look real.",
+              quote: "It gave me visibility I never thought possible. The dream started to look real.",
             },
           ].map((p, i) => (
             <motion.div
@@ -125,10 +100,7 @@ export default function Page() {
       </section>
 
       {/* CALL TO ACTION */}
-      <section
-        id="join"
-        className="mt-36 text-center py-24 bg-gradient-to-r from-[#FFF8E7] via-white to-[#FCE4EC]"
-      >
+      <section id="join" className="mt-36 text-center py-24">
         <h3 className="text-4xl font-semibold mb-4 text-[#2E2E2E]">
           Who’s gonna be the next star?
         </h3>
@@ -145,7 +117,7 @@ export default function Page() {
 
       {/* FOOTER */}
       <footer className="mt-16 py-10 text-center text-sm text-gray-500 border-t border-gray-100">
-        © {new Date().getFullYear()} StageConnect. All rights reserved.
+        © {new Date().getFullYear()} Starlink. All rights reserved.
       </footer>
     </div>
   );

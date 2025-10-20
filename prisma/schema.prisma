@@ -1,0 +1,266 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  job_seeker
+  employer
+}
+
+enum Visibility {
+  public
+  private
+}
+
+enum LocationType {
+  remote
+  on_site
+  hybrid
+}
+
+enum JobType {
+  full_time
+  part_time
+  contract
+  internship
+}
+
+enum ExperienceLevel {
+  entry
+  mid
+  senior
+  director
+  executive
+}
+
+enum JobStatus {
+  active
+  inactive
+  closed
+  draft
+}
+
+enum ApplicationStatus {
+  submitted
+  under_review
+  interview_scheduled
+  offer_extended
+  rejected
+  hired
+  withdrawn
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  profile       Profile?
+  experiences   Experience[]
+  educations    Education[]
+  resumes       Resume[]
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Profile {
+  user_id             String        @id @db.Uuid
+  user                User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  role                Role
+  first_name          String?       @db.VarChar(100)
+  last_name           String?       @db.VarChar(100)
+  phone_number        String?       @db.VarChar(50)
+  address             String?       @db.VarChar(255)
+  linkedin_profile    String?       @db.VarChar(255)
+  summary             String?
+  visibility          Visibility    @default(private)
+  company_name        String?       @db.VarChar(255)
+  company_description String?
+  industry            String?       @db.VarChar(100)
+  website             String?       @db.VarChar(255)
+  contact_person_name String?       @db.VarChar(200)
+  contact_person_email String?      @db.VarChar(255)
+  company_logo_url    String?       @db.VarChar(512)
+  skills              Json?
+  created_at          DateTime      @default(now()) @db.Timestamptz
+  updated_at          DateTime      @updatedAt @db.Timestamptz
+  @@map("profiles")
+}
+
+model Experience {
+  experience_id String    @id @default(uuid()) @db.Uuid
+  user_id       String    @db.Uuid
+  title         String    @db.VarChar(255)
+  company_name  String    @db.VarChar(255)
+  location      String?   @db.VarChar(100)
+  start_date    DateTime  @db.Date
+  end_date      DateTime? @db.Date
+  description   String?
+  created_at    DateTime  @default(now()) @db.Timestamptz
+  updated_at    DateTime  @updatedAt @db.Timestamptz
+  user          User      @relation(fields: [user_id], references: [id])
+  @@index([user_id])
+  @@map("experiences")
+}
+
+model Education {
+  education_id    String    @id @default(uuid()) @db.Uuid
+  user_id         String    @db.Uuid
+  institution_name String   @db.VarChar(255)
+  degree          String    @db.VarChar(255)
+  field_of_study  String?   @db.VarChar(255)
+  start_date      DateTime  @db.Date
+  end_date        DateTime? @db.Date
+  description     String?
+  created_at      DateTime  @default(now()) @db.Timestamptz
+  updated_at      DateTime  @updatedAt @db.Timestamptz
+  user            User      @relation(fields: [user_id], references: [id])
+  @@index([user_id])
+  @@map("educations")
+}
+
+model Resume {
+  resume_id         String   @id @default(uuid()) @db.Uuid
+  user_id           String   @db.Uuid
+  file_url          String   @db.VarChar(512)
+  original_filename String   @db.VarChar(255)
+  file_type         String   @db.VarChar(50)
+  extracted_text_url String? @db.VarChar(512)
+  uploaded_at       DateTime @default(now()) @db.Timestamptz
+  user              User     @relation(fields: [user_id], references: [id])
+  @@index([user_id])
+  @@map("resumes")
+}
+
+model Job {
+  job_id               String           @id @default(uuid()) @db.Uuid
+  employer_id          String           @db.Uuid
+  title                String           @db.VarChar(255)
+  description          String
+  requirements         String?
+  responsibilities     String?
+  location_type        LocationType
+  city                 String?          @db.VarChar(100)
+  state                String?          @db.VarChar(100)
+  country              String?          @db.VarChar(100)
+  job_type             JobType
+  salary_min           Decimal?         @db.Decimal
+  salary_max           Decimal?         @db.Decimal
+  industry             String?          @db.VarChar(100)
+  experience_level     ExperienceLevel
+  application_deadline DateTime?        @db.Timestamptz
+  status               JobStatus        @default(active)
+  required_skills      Json?
+  posted_at            DateTime         @default(now()) @db.Timestamptz
+  updated_at           DateTime         @updatedAt @db.Timestamptz
+  @@index([employer_id])
+  @@index([status])
+  @@index([location_type])
+  @@index([job_type])
+  @@map("jobs")
+}
+
+model Application {
+  application_id      String            @id @default(uuid()) @db.Uuid
+  user_id             String            @db.Uuid
+  job_id              String            @db.Uuid
+  resume_id           String            @db.Uuid
+  application_date    DateTime          @default(now()) @db.Timestamptz
+  status              ApplicationStatus @default(submitted)
+  ai_score            Decimal?          @db.Decimal
+  matched_skills      Json?
+  missing_skills      Json?
+  extracted_keywords  Json?
+  resume_summary      String?
+  updated_at          DateTime          @updatedAt @db.Timestamptz
+  @@index([user_id])
+  @@index([job_id])
+  @@index([status])
+  @@unique([user_id, job_id], map: "idx_applications_user_job")
+  @@map("applications")
+}
+
+model JobSeekerApplicationsView {
+  application_id     String    @id @db.Uuid
+  user_id            String    @db.Uuid
+  job_id             String    @db.Uuid
+  job_title          String    @db.VarChar(255)
+  company_name       String    @db.VarChar(255)
+  job_location_type  String?   @db.VarChar(20)
+  job_city           String?   @db.VarChar(100)
+  job_state          String?   @db.VarChar(100)
+  job_country        String?   @db.VarChar(100)
+  application_date   DateTime  @db.Timestamptz
+  status             String
+  ai_score           Decimal?  @db.Decimal
+  matched_skills     Json?
+  missing_skills     Json?
+  last_updated_at    DateTime  @updatedAt @db.Timestamptz
+  @@index([user_id], map: "idx_j_seeker_apps_view_user_id")
+  @@index([job_id], map: "idx_j_seeker_apps_view_job_id")
+  @@map("job_seeker_applications_view")
+}
+
+model EmployerJobApplicantsView {
+  application_id        String   @id @db.Uuid
+  job_id                String   @db.Uuid
+  employer_id           String   @db.Uuid
+  job_title             String   @db.VarChar(255)
+  applicant_user_id     String   @db.Uuid
+  applicant_first_name  String?  @db.VarChar(100)
+  applicant_last_name   String?  @db.VarChar(100)
+  applicant_email       String?  @db.VarChar(255)
+  applicant_resume_url  String?  @db.VarChar(512)
+  application_date      DateTime @db.Timestamptz
+  status                String   @db.VarChar(50)
+  ai_score              Decimal? @db.Decimal
+  matched_skills        Json?
+  missing_skills        Json?
+  last_updated_at       DateTime @updatedAt @db.Timestamptz
+  @@index([job_id], map: "idx_employer_apps_view_job_id")
+  @@index([employer_id], map: "idx_employer_apps_view_employer_id")
+  @@index([applicant_user_id], map: "idx_employer_apps_view_applicant_id")
+  @@map("employer_job_applicants_view")
+}
