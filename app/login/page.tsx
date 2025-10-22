@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 
 export default function LoginPage() {
   const [isSignIn, setIsSignIn] = useState(true);
+
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/" });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#FFF8E7] via-white to-[#FCE4EC] text-[#1E1E1E] font-sans">
@@ -121,7 +126,10 @@ export default function LoginPage() {
             <div className="text-[#6B6B6B] text-sm mt-4">Or continue with</div>
 
             <div className="flex gap-4 justify-center mt-2">
-              <button className="bg-[#FFF8E7] text-[#2E2E2E] px-4 py-2 rounded-lg border border-[#F3E6C9] hover:bg-[#FFF2CC] transition">
+              <button 
+                onClick={handleGoogleSignIn}
+                className="bg-[#FFF8E7] text-[#2E2E2E] px-4 py-2 rounded-lg border border-[#F3E6C9] hover:bg-[#FFF2CC] transition"
+              >
                 🔴 Google
               </button>
               <button className="bg-[#FFF8E7] text-[#2E2E2E] px-4 py-2 rounded-lg border border-[#F3E6C9] hover:bg-[#FFF2CC] transition">
