@@ -189,11 +189,13 @@ export default function FindTalentPage() {
             whileHover={{ y: -5 }}
             className="bg-white border border-[#F3E6C9] rounded-2xl p-5 flex gap-5 items-center shadow-sm hover:shadow-md transition"
           >
-            <Image
-              src="/profile.jpg"
-              alt="Sarah Johnson"
-              className="w-24 h-24 object-cover rounded-xl border border-[#F3E6C9]"
-            />
+        <Image
+          src="/profile.jpg"
+          alt="Sarah Johnson"
+          width={96}       // equivalent to w-24 (24 * 4 = 96px)
+          height={96}      // equivalent to h-24
+          className="object-cover rounded-xl border border-[#F3E6C9]"
+        />
             <div>
               <h3 className="text-xl font-semibold text-[#2E2E2E]">
                 Sarah Johnson

@@ -180,9 +180,13 @@ export default function Page() {
               whileHover={{ scale: 1.03 }}
               className="relative w-full h-52 rounded-2xl overflow-hidden shadow-sm border border-gray-100"
             >
+
               <Image
                 src={`https://placehold.co/400x250?text=Project+${i}`}
                 alt={`Project ${i}`}
+                width={96}       // equivalent to w-24 (24 * 4 = 96px)
+                height={96}      // equivalent to h-24
+
                 className="w-full h-full object-cover"
               />
             </motion.div>
@@ -201,6 +205,9 @@ export default function Page() {
               key={i}
               src={`https://placehold.co/80x80?text=C${i}`}
               alt={`Connection ${i}`}
+              width={96}       // equivalent to w-24 (24 * 4 = 96px)
+              height={96}      // equivalent to h-24
+
               className="w-16 h-16 rounded-full border-2 border-white shadow-sm"
             />
           ))}

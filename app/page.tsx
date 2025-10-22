@@ -49,12 +49,12 @@ export default function Page() {
           Connect, shine, and become the star you were meant to be.
         </p>
 
-        <motion.button
+       <Link href="/login"> <motion.button
           whileHover={{ scale: 1.05 }}
           className="mt-10 flex items-center gap-2 bg-[#D4AF37] text-white px-8 py-3 rounded-full font-semibold shadow-md hover:shadow-lg transition"
         >
           Get Started <ArrowRight className="w-5 h-5" />
-        </motion.button>
+        </motion.button></Link>
       </section>
 
       {/* FEATURE SECTION */}
@@ -135,12 +135,12 @@ export default function Page() {
         <p className="text-[#6B6B6B] mb-8">
           Your moment starts now. Build your fanbase. Find your spotlight.
         </p>
-        <motion.button
+       <Link href="/login"> <motion.button
           whileHover={{ scale: 1.05 }}
           className="bg-[#D4AF37] text-white px-8 py-3 rounded-full font-semibold shadow-md hover:shadow-lg transition"
         >
           Join the Platform
-        </motion.button>
+        </motion.button></Link>
       </section>
 
       {/* FOOTER */}
