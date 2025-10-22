@@ -27,9 +27,10 @@ enum JobType {
   full_time
   part_time
   contract
-  internship
+  internship //remove
 }
 
+//needs to be changed
 enum ExperienceLevel {
   entry
   mid
@@ -41,8 +42,8 @@ enum ExperienceLevel {
 enum JobStatus {
   active
   inactive
-  closed
-  draft
+  closed //remove
+  draft //remove
 }
 
 enum ApplicationStatus {
@@ -161,6 +162,7 @@ model Education {
   @@map("educations")
 }
 
+//Remove
 model Resume {
   resume_id         String   @id @default(uuid()) @db.Uuid
   user_id           String   @db.Uuid
