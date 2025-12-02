@@ -23,6 +23,8 @@ enum TalentCategory {
   photographer
   videographer
   makeup_artist
+  script_writer
+  fashion_designer
   other
 }
 
@@ -139,6 +141,7 @@ model Profile {
   youtube_profile     String?         @db.VarChar(255)
   bio                 String?
   visibility          Visibility      @default(public)
+  gig_count           Int
   
   // Talent-specific fields
   talent_category     TalentCategory?

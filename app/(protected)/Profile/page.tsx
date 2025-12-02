@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { MapPin, Mail, Users, Video, Award, MessageCircle, Briefcase } from "lucide-react";
-import Navbar from "../Components/Navbar";
-import Footer from "../Components/Footer";
+import Navbar from "../../Components/Navbar";
+import Footer from "../../Components/Footer";
 import Link from "next/link";
 import Image from "next/image";
 export default function Page() {
@@ -183,6 +183,9 @@ export default function Page() {
               <Image
                 src={`https://placehold.co/400x250?text=Project+${i}`}
                 alt={`Project ${i}`}
+                width={96}       // equivalent to w-24 (24 * 4 = 96px)
+                height={96}      // equivalent to h-24
+
                 className="w-full h-full object-cover"
               />
             </motion.div>
