@@ -9,6 +9,7 @@ Actions/
 ├── auditions.ts    # Audition-related server actions
 ├── jobs.ts         # Job-related server actions
 ├── portfolio.ts    # Portfolio-related server actions
+├── profile.ts      # Profile-related server actions
 └── types.ts        # Shared TypeScript types
 ```
 
@@ -104,6 +105,91 @@ Searches jobs with multiple filter options.
 Checks if a user has already applied to a specific job.
 
 **Returns:** Boolean indicating application status
+
+## Profile Actions (`profile.ts`)
+
+### Functions
+
+#### `getUserProfile(userId: string)`
+Gets complete user profile with all related data including experiences, education, and portfolio items.
+
+**Includes:** Profile, experiences (sorted desc), educations (sorted desc), top 6 portfolio items
+
+**Returns:** Complete user profile object
+
+#### `getProfile(userId: string)`
+Gets only the profile data for a user.
+
+**Returns:** Profile object
+
+#### `updateProfile(userId: string, data: { ... })`
+Updates user profile information.
+
+**Updatable:** `firstName`, `lastName`, `phoneNumber`, `address`, `instagramProfile`, `youtubeProfile`, `bio`, `visibility`, `talentCategory`, `specializations`, `height`, `weight`, `age`, `languages`, `skills`, `hourlyRate`, `availability`, `companyName`, `companyDescription`, `industry`, `website`
+
+**Returns:** Updated profile object
+
+#### `getUserExperiences(userId: string)`
+Gets all work experiences for a user.
+
+**Ordering:** Sorted by start date (newest first)
+
+**Returns:** Array of experience objects
+
+#### `createExperience(userId: string, data: { ... })`
+Creates a new work experience entry.
+
+**Required:** `title`, `startDate`
+
+**Optional:** `companyName`, `projectName`, `location`, `endDate`, `description`, `mediaUrls`
+
+**Returns:** Created experience object
+
+#### `updateExperience(experienceId: string, data: { ... })`
+Updates an existing work experience.
+
+**Returns:** Updated experience object
+
+#### `deleteExperience(experienceId: string)`
+Deletes a work experience entry.
+
+**Returns:** Success status
+
+#### `getUserEducation(userId: string)`
+Gets all education records for a user.
+
+**Ordering:** Sorted by start date (newest first)
+
+**Returns:** Array of education objects
+
+#### `createEducation(userId: string, data: { ... })`
+Creates a new education record.
+
+**Required:** `institutionName`, `degree`, `startDate`
+
+**Optional:** `fieldOfStudy`, `endDate`, `description`, `certificateUrl`
+
+**Returns:** Created education object
+
+#### `updateEducation(educationId: string, data: { ... })`
+Updates an existing education record.
+
+**Returns:** Updated education object
+
+#### `deleteEducation(educationId: string)`
+Deletes an education record.
+
+**Returns:** Success status
+
+#### `getProfileStats(userId: string)`
+Gets profile statistics including gig count, auditions count, and portfolio count.
+
+**Returns:** Statistics object with counts
+
+#### `getProfileHighlights(userId: string)`
+Gets profile highlights combining featured portfolio items and successful auditions.
+
+**Returns:** Array of highlight objects
 
 ## Portfolio Actions (`portfolio.ts`)
 
