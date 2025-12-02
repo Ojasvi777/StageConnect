@@ -10,6 +10,7 @@ Actions/
 ├── jobs.ts         # Job-related server actions
 ├── portfolio.ts    # Portfolio-related server actions
 ├── profile.ts      # Profile-related server actions
+├── talent.ts       # Talent browsing server actions
 └── types.ts        # Shared TypeScript types
 ```
 
@@ -239,6 +240,70 @@ Updates an existing portfolio item's metadata.
 Permanently deletes a portfolio item.
 
 **Returns:** Success status
+
+## Talent Actions (`talent.ts`)
+
+### Functions
+
+#### `getAllTalentProfiles()`
+Retrieves all public talent profiles for employers to browse.
+
+**Returns:** 
+- Array of talent profiles with basic information
+- User data (id, name, email, image)
+- Featured portfolio items (up to 3)
+- Total count of profiles
+
+**Usage:**
+```typescript
+const result = await getAllTalentProfiles();
+if (result.success) {
+  console.log(`Found ${result.count} talents`);
+  console.log(result.data);
+}
+```
+
+#### `getTalentsByCategory(category: TalentCategory)`
+Filters talent profiles by specific category (e.g., singer, dancer, actor).
+
+**Parameters:**
+- `category`: TalentCategory enum value
+
+**Returns:** 
+- Filtered array of talent profiles
+- User data and featured portfolio items
+- Count of matching profiles
+
+**Usage:**
+```typescript
+import { TalentCategory } from './enums';
+
+const result = await getTalentsByCategory(TalentCategory.singer);
+if (result.success) {
+  console.log(`Found ${result.count} singers`);
+}
+```
+
+#### `getTalentProfileDetails(userId: string)`
+Gets comprehensive profile information for a specific talent.
+
+**Parameters:**
+- `userId`: UUID of the talent user
+
+**Returns:**
+- Complete profile with all fields
+- Experiences (ordered by date)
+- Education history
+- Full portfolio items (ordered by featured status and date)
+
+**Usage:**
+```typescript
+const result = await getTalentProfileDetails(userId);
+if (result.success) {
+  const profile = result.data;
+  console.log(profile.user.experiences);
+}
+```
 
 ## Usage Example
 
