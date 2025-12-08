@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Footer from "./Components/Footer";
 export default function Page() {
   return (
     <div className="min-h-screen bg-white text-[#1E1E1E] font-sans">
@@ -12,15 +13,9 @@ export default function Page() {
           StageConnect
         </h1>
         <div className="space-x-8 text-sm md:text-base font-medium">
-          <a href="#discover" className="hover:text-[#E58BB4] transition">
-            Discover
-          </a>
-          <a href="#stories" className="hover:text-[#E58BB4] transition">
-            Stories
-          </a>
-          <a href="#join" className="hover:text-[#E58BB4] transition">
-            Join
-          </a>
+          <Link href="/Home" className="hover:text-[#E58BB4] transition">
+            Home
+          </Link>
           <Link href="/login" className="hover:text-[#E58BB4] transition">
             Login
           </Link>
@@ -142,11 +137,7 @@ export default function Page() {
           Join the Platform
         </motion.button></Link>
       </section>
-
-      {/* FOOTER */}
-      <footer className="mt-16 py-10 text-center text-sm text-gray-500 border-t border-gray-100">
-        © {new Date().getFullYear()} StageConnect. All rights reserved.
-      </footer>
+      <Footer/>
     </div>
   );
 }
