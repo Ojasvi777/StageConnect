@@ -72,7 +72,7 @@ export default function FindTalentPage() {
     <main>
       <Navbar />
 
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8E7] via-white to-[#FCE4EC] text-[#1E1E1E] font-sans pb-20">
+      <div className="min-h-screen bg-linear-to-b from-[#FFF8E7] via-white to-[#FCE4EC] text-[#1E1E1E] font-sans pb-20">
 
         {/* HEADER */}
         <div className="text-center py-16 bg-[#FFF2CC] shadow-sm">
