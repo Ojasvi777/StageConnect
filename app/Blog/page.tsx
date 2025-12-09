@@ -111,7 +111,7 @@ export default function BlogPage() {
           placeholder="Search stories, tips..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full md:w-1/2 bg-gray-100 border border-gray-300 px-4 py-2 rounded-lg focus:ring-[2px] focus:ring-[#f5d787] outline-none"
+          className="w-full md:w-1/2 bg-gray-100 border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-[#f5d787] outline-none"
         />
 
         <select
