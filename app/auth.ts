@@ -19,6 +19,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async session({ session, user }) {
+      // Add user id to session
+      if (session.user) {
+        (session.user as any).id = user.id;
+      }
+      return session;
+    },
     async redirect({ url, baseUrl }) {
       if (url.startsWith(baseUrl)) return url;
       if (url.startsWith("/")) return `${baseUrl}${url}`;

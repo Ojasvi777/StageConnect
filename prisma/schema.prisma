@@ -8,8 +8,31 @@ generator client {
 }
 
 enum Role {
-  job_seeker
-  employer
+  talent        // Creative professionals (singers, dancers, actors, etc.)
+  employer      // Companies/individuals hiring talent
+}
+
+enum TalentCategory {
+  singer
+  dancer
+  actor
+  model
+  musician
+  voice_artist
+  choreographer
+  photographer
+  videographer
+  makeup_artist
+  script_writer
+  fashion_designer
+  other
+}
+
+enum MediaType {
+  image
+  video
+  audio
+  document
 }
 
 enum Visibility {
@@ -27,47 +50,45 @@ enum JobType {
   full_time
   part_time
   contract
-  internship //remove
+  gig          // One-time or short-term creative projects
 }
 
-//needs to be changed
 enum ExperienceLevel {
-  entry
+  beginner 
   mid
-  senior
-  director
-  executive
+  professional
 }
 
 enum JobStatus {
   active
   inactive
-  closed //remove
-  draft //remove
+  closed
+  draft 
 }
 
-enum ApplicationStatus {
+enum AuditionStatus {
   submitted
   under_review
-  interview_scheduled
-  offer_extended
+  shortlisted
+  audition_scheduled
+  selected
   rejected
-  hired
   withdrawn
 }
 
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String         @id @default(uuid()) @db.Uuid
   name          String?
-  email         String    @unique
+  email         String         @unique
   emailVerified DateTime?
-  image         String?
+  image         String?        @db.VarChar(512) // S3 URL for profile picture
   accounts      Account[]
   sessions      Session[]
   profile       Profile?
   experiences   Experience[]
   educations    Education[]
-  resumes       Resume[]
+  portfolioItems PortfolioItem[] // Multiple media items in portfolio
+  auditions     Audition[]
   @@map("users")
 }
 
@@ -107,41 +128,64 @@ model VerificationToken {
 }
 
 model Profile {
-  user_id             String        @id @db.Uuid
-  user                User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id             String          @id @db.Uuid
+  user                User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   role                Role
-  first_name          String?       @db.VarChar(100)
-  last_name           String?       @db.VarChar(100)
-  phone_number        String?       @db.VarChar(50)
-  address             String?       @db.VarChar(255)
-  linkedin_profile    String?       @db.VarChar(255)
-  summary             String?
-  visibility          Visibility    @default(private)
-  company_name        String?       @db.VarChar(255)
+  
+  // Common fields
+  first_name          String?         @db.VarChar(100)
+  last_name           String?         @db.VarChar(100)
+  phone_number        String?         @db.VarChar(50)
+  address             String?         @db.VarChar(255)
+  instagram_profile   String?         @db.VarChar(255)
+  youtube_profile     String?         @db.VarChar(255)
+  bio                 String?
+  visibility          Visibility      @default(public)
+  gig_count           Int
+  
+  // Talent-specific fields
+  talent_category     TalentCategory?
+  specializations     Json?           // Array of specializations (e.g., ["Classical", "Jazz"] for singers)
+  height              Decimal?        @db.Decimal(5,2) // in cm
+  weight              Decimal?        @db.Decimal(5,2) // in kg
+  age                 Int?
+  languages           Json?           // Array of languages spoken
+  intro_video_url     String?         @db.VarChar(512) // S3 URL for introduction video
+  profile_photos      Json?           // Array of S3 URLs for profile photos
+  skills              Json?           // Technical skills
+  hourly_rate         Decimal?        @db.Decimal(10,2)
+  availability        String?         @db.VarChar(100) // e.g., "Full-time", "Weekends only"
+  
+  // Employer-specific fields
+  company_name        String?         @db.VarChar(255) 
   company_description String?
-  industry            String?       @db.VarChar(100)
-  website             String?       @db.VarChar(255)
-  contact_person_name String?       @db.VarChar(200)
-  contact_person_email String?      @db.VarChar(255)
-  company_logo_url    String?       @db.VarChar(512)
-  skills              Json?
-  created_at          DateTime      @default(now()) @db.Timestamptz
-  updated_at          DateTime      @updatedAt @db.Timestamptz
+  industry            String?         @db.VarChar(100)
+  website             String?         @db.VarChar(255)
+  contact_person_name String?         @db.VarChar(200)
+  contact_person_email String?        @db.VarChar(255)
+  company_logo_url    String?         @db.VarChar(512) // S3 URL for company logo
+  
+  created_at          DateTime        @default(now()) @db.Timestamptz
+  updated_at          DateTime        @updatedAt @db.Timestamptz
+  jobs                Job[]
+
   @@map("profiles")
 }
 
 model Experience {
   experience_id String    @id @default(uuid()) @db.Uuid
   user_id       String    @db.Uuid
-  title         String    @db.VarChar(255)
-  company_name  String    @db.VarChar(255)
+  title         String    @db.VarChar(255) // e.g., "Lead Singer", "Backup Dancer"
+  company_name  String?   @db.VarChar(255) // Production house, band name, etc.
+  project_name  String?   @db.VarChar(255) // Movie, show, concert name
   location      String?   @db.VarChar(100)
   start_date    DateTime  @db.Date
   end_date      DateTime? @db.Date
   description   String?
+  media_urls    Json?     // Array of S3 URLs for photos/videos from this experience
   created_at    DateTime  @default(now()) @db.Timestamptz
   updated_at    DateTime  @updatedAt @db.Timestamptz
-  user          User      @relation(fields: [user_id], references: [id])
+  user          User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   @@index([user_id])
   @@map("experiences")
 }
@@ -149,83 +193,107 @@ model Experience {
 model Education {
   education_id    String    @id @default(uuid()) @db.Uuid
   user_id         String    @db.Uuid
-  institution_name String   @db.VarChar(255)
-  degree          String    @db.VarChar(255)
-  field_of_study  String?   @db.VarChar(255)
+  institution_name String   @db.VarChar(255) // School, academy, workshop
+  degree          String    @db.VarChar(255) // Degree, certification, or course name
+  field_of_study  String?   @db.VarChar(255) // e.g., "Classical Dance", "Vocal Music"
   start_date      DateTime  @db.Date
   end_date        DateTime? @db.Date
   description     String?
+  certificate_url String?   @db.VarChar(512) // S3 URL for certificate/proof
   created_at      DateTime  @default(now()) @db.Timestamptz
   updated_at      DateTime  @updatedAt @db.Timestamptz
-  user            User      @relation(fields: [user_id], references: [id])
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   @@index([user_id])
   @@map("educations")
 }
 
-//Remove
-model Resume {
-  resume_id         String   @id @default(uuid()) @db.Uuid
-  user_id           String   @db.Uuid
-  file_url          String   @db.VarChar(512)
-  original_filename String   @db.VarChar(255)
-  file_type         String   @db.VarChar(50)
-  extracted_text_url String? @db.VarChar(512)
-  uploaded_at       DateTime @default(now()) @db.Timestamptz
-  user              User     @relation(fields: [user_id], references: [id])
+// Portfolio items - images, videos, audio clips
+model PortfolioItem {
+  portfolio_id      String     @id @default(uuid()) @db.Uuid
+  user_id           String     @db.Uuid
+  title             String?    @db.VarChar(255) // Title/description of the work
+  media_url         String     @db.VarChar(512) // S3 URL for the media file
+  thumbnail_url     String?    @db.VarChar(512) // S3 URL for thumbnail (for videos)
+  media_type        MediaType  // image, video, audio, document
+  file_size         Int?       // File size in bytes
+  duration          Int?       // Duration in seconds (for video/audio)
+  description       String?    // Description of the work
+  tags              Json?      // Array of tags for categorization
+  is_featured       Boolean    @default(false) // Featured/highlight item
+  display_order     Int?       // Order in which to display
+  uploaded_at       DateTime   @default(now()) @db.Timestamptz
+  user              User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  auditions         Audition[]
   @@index([user_id])
-  @@map("resumes")
+  @@index([media_type])
+  @@index([is_featured])
+  @@map("portfolio_items")
 }
 
 model Job {
   job_id               String           @id @default(uuid()) @db.Uuid
   employer_id          String           @db.Uuid
-  title                String           @db.VarChar(255)
+  profile              Profile          @relation(fields: [employer_id], references: [user_id], onDelete: Cascade)
+  title                String           @db.VarChar(255) // e.g., "Lead Singer for Concert"
   description          String
-  requirements         String?
+  requirements         String?          // Skills, experience needed
   responsibilities     String?
+  talent_category      TalentCategory?  // Type of talent needed
   location_type        LocationType
   city                 String?          @db.VarChar(100)
   state                String?          @db.VarChar(100)
   country              String?          @db.VarChar(100)
+  venue                String?          @db.VarChar(255) // Specific venue/location
   job_type             JobType
-  salary_min           Decimal?         @db.Decimal
-  salary_max           Decimal?         @db.Decimal
-  industry             String?          @db.VarChar(100)
+  compensation_min     Decimal?         @db.Decimal(10,2) // Payment range
+  compensation_max     Decimal?         @db.Decimal(10,2)
+  compensation_type    String?          @db.VarChar(50) // "per hour", "per day", "per project"
+  event_date           DateTime?        @db.Timestamptz // Date of performance/event
   experience_level     ExperienceLevel
   application_deadline DateTime?        @db.Timestamptz
+  audition_required    Boolean          @default(false)
+  audition_date        DateTime?        @db.Timestamptz
+  audition_location    String?          @db.VarChar(255)
   status               JobStatus        @default(active)
-  required_skills      Json?
+  required_skills      Json?            // Array of required skills
+  preferred_age_min    Int?
+  preferred_age_max    Int?
+  slots_available      Int?             // Number of positions available
   posted_at            DateTime         @default(now()) @db.Timestamptz
   updated_at           DateTime         @updatedAt @db.Timestamptz
+  auditions            Audition[]
   @@index([employer_id])
   @@index([status])
   @@index([location_type])
   @@index([job_type])
+  @@index([talent_category])
+  @@index([application_deadline])
   @@map("jobs")
 }
 
-model Application {
-  application_id      String            @id @default(uuid()) @db.Uuid
-  user_id             String            @db.Uuid
-  job_id              String            @db.Uuid
-  resume_id           String            @db.Uuid
-  application_date    DateTime          @default(now()) @db.Timestamptz
-  status              ApplicationStatus @default(submitted)
-  ai_score            Decimal?          @db.Decimal
-  matched_skills      Json?
-  missing_skills      Json?
-  extracted_keywords  Json?
-  resume_summary      String?
-  updated_at          DateTime          @updatedAt @db.Timestamptz
+model Audition {
+  audition_id         String          @id @default(uuid()) @db.Uuid
+  user_id             String          @db.Uuid
+  user                User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  job_id              String          @db.Uuid
+  job                 Job             @relation(fields: [job_id], references: [job_id], onDelete: Cascade)
+  portfolio_id        String?         @db.Uuid // Main portfolio item submitted
+  portfolio           PortfolioItem?  @relation(fields: [portfolio_id], references: [portfolio_id], onDelete: SetNull)
+  cover_letter        String?         // Why they're applying
+  submitted_at        DateTime        @default(now()) @db.Timestamptz
+  status              AuditionStatus  @default(submitted)
+  audition_notes      String?         // Notes from employer after audition
+  rating              Int?            // Employer rating (1-5)
+  updated_at          DateTime        @updatedAt @db.Timestamptz
   @@index([user_id])
   @@index([job_id])
   @@index([status])
-  @@unique([user_id, job_id], map: "idx_applications_user_job")
-  @@map("applications")
+  @@unique([user_id, job_id], map: "auditions_user_job")
+  @@map("auditions")
 }
 
-model JobSeekerApplicationsView {
-  application_id     String    @id @db.Uuid
+model TalentAuditionsView {
+  audition_id        String    @id @db.Uuid
   user_id            String    @db.Uuid
   job_id             String    @db.Uuid
   job_title          String    @db.VarChar(255)
@@ -234,33 +302,34 @@ model JobSeekerApplicationsView {
   job_city           String?   @db.VarChar(100)
   job_state          String?   @db.VarChar(100)
   job_country        String?   @db.VarChar(100)
-  application_date   DateTime  @db.Timestamptz
-  status             String
-  ai_score           Decimal?  @db.Decimal
-  matched_skills     Json?
-  missing_skills     Json?
+  venue              String?   @db.VarChar(255)
+  event_date         DateTime? @db.Timestamptz
+  submitted_at       DateTime  @db.Timestamptz
+  status             String    @db.VarChar(50)
+  compensation_min   Decimal?  @db.Decimal(10,2)
+  compensation_max   Decimal?  @db.Decimal(10,2)
   last_updated_at    DateTime  @updatedAt @db.Timestamptz
-  @@index([user_id], map: "idx_j_seeker_apps_view_user_id")
-  @@index([job_id], map: "idx_j_seeker_apps_view_job_id")
-  @@map("job_seeker_applications_view")
+  @@index([user_id], map: "idx_talent_apps_view_user_id")
+  @@index([job_id], map: "idx_talent_apps_view_job_id")
+  @@map("talent_auditions_view")
 }
 
 model EmployerJobApplicantsView {
-  application_id        String   @id @db.Uuid
-  job_id                String   @db.Uuid
-  employer_id           String   @db.Uuid
-  job_title             String   @db.VarChar(255)
-  applicant_user_id     String   @db.Uuid
-  applicant_first_name  String?  @db.VarChar(100)
-  applicant_last_name   String?  @db.VarChar(100)
-  applicant_email       String?  @db.VarChar(255)
-  applicant_resume_url  String?  @db.VarChar(512)
-  application_date      DateTime @db.Timestamptz
-  status                String   @db.VarChar(50)
-  ai_score              Decimal? @db.Decimal
-  matched_skills        Json?
-  missing_skills        Json?
-  last_updated_at       DateTime @updatedAt @db.Timestamptz
+  audition_id             String   @id @db.Uuid
+  job_id                  String   @db.Uuid
+  employer_id             String   @db.Uuid
+  job_title               String   @db.VarChar(255)
+  applicant_user_id       String   @db.Uuid
+  applicant_first_name    String?  @db.VarChar(100)
+  applicant_last_name     String?  @db.VarChar(100)
+  applicant_email         String?  @db.VarChar(255)
+  applicant_talent_category String? @db.VarChar(50)
+  applicant_portfolio_url String?  @db.VarChar(512) // Main portfolio item URL
+  applicant_intro_video   String?  @db.VarChar(512)
+  submitted_at            DateTime @db.Timestamptz
+  status                  String   @db.VarChar(50)
+  rating                  Int?
+  last_updated_at         DateTime @updatedAt @db.Timestamptz
   @@index([job_id], map: "idx_employer_apps_view_job_id")
   @@index([employer_id], map: "idx_employer_apps_view_employer_id")
   @@index([applicant_user_id], map: "idx_employer_apps_view_applicant_id")

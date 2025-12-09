@@ -102,7 +102,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white text-black px-6 md:px-12 py-10 font-inter">
-<Navbar/>
+
       {/* Search + Filter Bar */}
       <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
 
@@ -256,7 +256,7 @@ export default function BlogPage() {
           </div>
         </div>
       )}
-<Footer/>
+
     </div>
   );
 }
