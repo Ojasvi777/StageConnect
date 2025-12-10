@@ -109,12 +109,75 @@ export default function ProfileClient({ user, stats, highlights }: ProfileClient
         </div>
       </div>
 
+      {/* AUDITIONS SECTION */}
+      <section className="max-w-5xl mx-auto mt-16 px-6">
+        <h2 className="text-2xl font-semibold text-[#D4AF37] mb-6 flex items-center gap-2">
+          <Award className="text-[#D4AF37]" /> Auditions
+        </h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {stats.auditionsCount > 0 ? (
+            // This can be populated with real audition data when available
+            Array.from({ length: Math.min(3, stats.auditionsCount) }).map((_, i) => (
+              <motion.div
+                key={i}
+                whileHover={{ y: -5 }}
+                className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition"
+              >
+                <h4 className="text-lg font-semibold text-[#2E2E2E] mb-2">
+                  Audition {i + 1}
+                </h4>
+                <p className="text-[#6B6B6B]">Details coming soon...</p>
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-3 text-center py-8">
+              <p className="text-[#6B6B6B]">No auditions yet. Check back later!</p>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* ABOUT SECTION */}
       <section className="max-w-5xl mx-auto mt-16 px-6">
         <h2 className="text-2xl font-semibold text-[#D4AF37] mb-4">About</h2>
         <p className="text-[#4A4A4A] leading-relaxed">
           {profile?.bio || "No bio available yet."}
         </p>
+        
+        {/* Hashtags/Tags based on profile data */}
+        <div className="flex flex-wrap gap-3 mt-4">
+          {profile?.talent_category && (
+            <span className="px-3 py-1 bg-[#FFF8E7] text-[#D4AF37] font-medium rounded-full border border-[#F3E6C9]">
+              #{talentCategoryDisplay.replace(/\s+/g, '')}
+            </span>
+          )}
+          {specializations && specializations.slice(0, 3).map((spec: string, i: number) => (
+            <span
+              key={i}
+              className="px-3 py-1 bg-[#FFF8E7] text-[#D4AF37] font-medium rounded-full border border-[#F3E6C9]"
+            >
+              #{spec.replace(/\s+/g, '')}
+            </span>
+          ))}
+          {skills && skills.slice(0, 2).map((skill: string, i: number) => (
+            <span
+              key={`skill-${i}`}
+              className="px-3 py-1 bg-[#FFF8E7] text-[#D4AF37] font-medium rounded-full border border-[#F3E6C9]"
+            >
+              #{skill.replace(/\s+/g, '')}
+            </span>
+          ))}
+          {!profile?.talent_category && !specializations && !skills && (
+            <>
+              <span className="px-3 py-1 bg-[#FFF8E7] text-[#D4AF37] font-medium rounded-full border border-[#F3E6C9]">
+                #Talent
+              </span>
+              <span className="px-3 py-1 bg-[#FFF8E7] text-[#D4AF37] font-medium rounded-full border border-[#F3E6C9]">
+                #Creative
+              </span>
+            </>
+          )}
+        </div>
         
         {/* Skills & Languages */}
         <div className="mt-6 space-y-4">
@@ -267,6 +330,32 @@ export default function ProfileClient({ user, stats, highlights }: ProfileClient
           </div>
         </section>
       )}
+
+      {/* CONNECTIONS */}
+      <section className="max-w-5xl mx-auto mt-16 px-6 text-center">
+        <h2 className="text-2xl font-semibold text-[#D4AF37] mb-6 flex justify-center items-center gap-2">
+          <Users className="text-[#D4AF37]" /> Connections
+        </h2>
+        {stats.connectionsCount > 0 ? (
+          <>
+            <div className="flex justify-center gap-4 flex-wrap">
+              {Array.from({ length: Math.min(5, stats.connectionsCount) }).map((_, i) => (
+                <Image
+                  key={i}
+                  src={`https://ui-avatars.com/api/?name=User+${i + 1}&background=D4AF37&color=fff&size=80`}
+                  alt={`Connection ${i + 1}`}
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-full border-2 border-white shadow-sm"
+                />
+              ))}
+            </div>
+            <p className="mt-4 text-[#6B6B6B]">Connected with {stats.connectionsCount}+ creators</p>
+          </>
+        ) : (
+          <p className="text-[#6B6B6B]">No connections yet. Start networking!</p>
+        )}
+      </section>
 
       {/* EDUCATION */}
       {user.educations && user.educations.length > 0 && (

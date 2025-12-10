@@ -13,18 +13,39 @@ import type { TalentProfile } from "../../Actions/types";
 
 export default function FindTalentPage() {
   const categoryMapping: Record<string, TalentCategory | null> = {
+    "All": null,
     "Actors & Performers": TalentCategory.actor,
     "Singers": TalentCategory.singer,
     "Dancers": TalentCategory.dancer,
     "Models": TalentCategory.model,
     "Voiceover Artists": TalentCategory.voice_artist,
+    "Crew": null, // Add to enum if needed
+    "Content Creators": null,
+    "Photographers": null,
+    "Fashion Designers": null,
+    "Makeup Artists": null,
+    "Writers": null,
+    "Directors": null,
+    "Producers": null,
+    "Choreographers": null,
+    "Casting Directors": null,
     "Musicians": TalentCategory.musician,
-    "All Categories": null,
+    "Comedians": null,
   };
 
   const categories = Object.keys(categoryMapping);
 
-  const [activeCategory, setActiveCategory] = useState<string>("All Categories");
+  const specialtyOptions: Record<string, string[]> = {
+    "Singers": ["Classical", "Pop", "Hip Hop", "Jazz", "R&B", "Folk", "Rock", "Indie", "Bollywood"],
+    "Dancers": ["Classical", "Contemporary", "Hip Hop", "Kathak", "Bharatanatyam", "Street Jazz", "Salsa", "Freestyle"],
+    "Actors & Performers": ["Drama", "Comedy", "Action", "Thriller", "Romantic", "Theater"],
+    "Musicians": ["Classical", "Jazz", "Rock", "Electronic", "Folk", "Orchestral", "String"],
+    "Comedians": ["Stand-up", "Improv", "Sketch", "Dark Comedy"],
+  };
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedRoleTypes, setSelectedRoleTypes] = useState<string[]>([]);
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const [talents, setTalents] = useState<TalentProfile[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -36,11 +57,28 @@ export default function FindTalentPage() {
   const [genderFilter, setGenderFilter] = useState<string>("Any");
   const [ageMin, setAgeMin] = useState<string>("");
   const [ageMax, setAgeMax] = useState<string>("");
+  const [heightRange, setHeightRange] = useState({ min: "", max: "" });
+  const [weightRange, setWeightRange] = useState({ min: "", max: "" });
+  const [specialty, setSpecialty] = useState<string>("");
+  const [experience, setExperience] = useState<string>("");
+  const [availability, setAvailability] = useState<string>("");
   const [filters, setFilters] = useState<Record<string, boolean>>({
     Female: false,
     "Mumbai, India": false,
     "Has Headshot": false,
   });
+
+  const toggleCategory = (category: string) => {
+    if (category === "All") {
+      setSelectedCategories([]);
+    } else {
+      setSelectedCategories((prev) =>
+        prev.includes(category)
+          ? prev.filter((c) => c !== category)
+          : [...prev, category]
+      );
+    }
+  };
 
   const toggleFilter = (key: string) => {
     setFilters((prev) => {
@@ -68,28 +106,44 @@ export default function FindTalentPage() {
     });
   };
 
-  // Fetch talents on component mount and when category changes
+  // Fetch talents on component mount and when categories change
   useEffect(() => {
     const fetchTalents = async () => {
       setLoading(true);
       try {
-        const selectedCategory = categoryMapping[activeCategory];
-        
-        let result;
-        if (selectedCategory) {
-          result = await getTalentsByCategory(selectedCategory);
+        // If no categories selected or "All" is selected, get all talents
+        if (selectedCategories.length === 0) {
+          const result = await getAllTalentProfiles();
+          if (result.success) {
+            setAllTalents(result.data);
+            setTalents(result.data);
+            setTotalCount(result.count);
+          } else {
+            setAllTalents([]);
+            setTalents([]);
+            setTotalCount(0);
+          }
         } else {
-          result = await getAllTalentProfiles();
-        }
+          // Fetch talents for each selected category and combine
+          const talentPromises = selectedCategories.map(async (cat) => {
+            const selectedCategory = categoryMapping[cat];
+            if (selectedCategory) {
+              return await getTalentsByCategory(selectedCategory);
+            }
+            return { success: false, data: [], count: 0 };
+          });
 
-        if (result.success) {
-          setAllTalents(result.data);
-          setTalents(result.data);
-          setTotalCount(result.count);
-        } else {
-          setAllTalents([]);
-          setTalents([]);
-          setTotalCount(0);
+          const results = await Promise.all(talentPromises);
+          const allData = results.flatMap(r => r.success ? r.data : []);
+          
+          // Remove duplicates based on user_id
+          const uniqueTalents = Array.from(
+            new Map(allData.map(item => [item.user_id, item])).values()
+          );
+
+          setAllTalents(uniqueTalents);
+          setTalents(uniqueTalents);
+          setTotalCount(uniqueTalents.length);
         }
       } catch (error) {
         console.error("Error in fetchTalents:", error);
@@ -102,7 +156,7 @@ export default function FindTalentPage() {
     };
 
     fetchTalents();
-  }, [activeCategory]);
+  }, [selectedCategories]);
 
   // Apply filters function
   const applyFilters = () => {
@@ -148,6 +202,36 @@ export default function FindTalentPage() {
       });
     }
 
+    // Height range filter
+    if (heightRange.min || heightRange.max) {
+      filtered = filtered.filter((talent) => {
+        if (!talent.height) return false;
+        const min = heightRange.min ? parseInt(heightRange.min) : 0;
+        const max = heightRange.max ? parseInt(heightRange.max) : 999;
+        return talent.height >= min && talent.height <= max;
+      });
+    }
+
+    // Weight range filter
+    if (weightRange.min || weightRange.max) {
+      filtered = filtered.filter((talent) => {
+        if (!talent.weight) return false;
+        const min = weightRange.min ? parseInt(weightRange.min) : 0;
+        const max = weightRange.max ? parseInt(weightRange.max) : 999;
+        return talent.weight >= min && talent.weight <= max;
+      });
+    }
+
+    // Role Type filter
+    if (selectedRoleTypes.length > 0) {
+      filtered = filtered.filter((talent) => {
+        const talentCat = getCategoryDisplay(talent.talent_category);
+        return selectedRoleTypes.some(role => 
+          role === "All" || talentCat.toLowerCase().includes(role.toLowerCase())
+        );
+      });
+    }
+
     // Has Headshot filter (portfolio items)
     if (filters["Has Headshot"]) {
       filtered = filtered.filter((talent) => 
@@ -166,6 +250,12 @@ export default function FindTalentPage() {
     setGenderFilter("Any");
     setAgeMin("");
     setAgeMax("");
+    setHeightRange({ min: "", max: "" });
+    setWeightRange({ min: "", max: "" });
+    setSpecialty("");
+    setExperience("");
+    setAvailability("");
+    setSelectedRoleTypes([]);
     setFilters({
       Female: false,
       "Mumbai, India": false,
@@ -211,7 +301,7 @@ export default function FindTalentPage() {
     <main>
       <Navbar />
 
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8E7] via-white to-[#FCE4EC] text-[#1E1E1E] font-sans pb-20">
+      <div className="min-h-screen bg-linear-to-b from-[#FFF8E7] via-white to-[#FCE4EC] text-[#1E1E1E] font-sans pb-20">
       {/* HEADER */}
       <div className="text-center py-16 bg-[#FFF2CC] shadow-sm">
         <h1 className="text-4xl font-extrabold text-[#2E2E2E]">Find Talent</h1>
@@ -221,20 +311,46 @@ export default function FindTalentPage() {
       </div>
 
       {/* CATEGORY TABS */}
-      <div className="flex flex-wrap justify-center gap-3 mt-8 px-6">
-        {categories.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveCategory(tab)}
-            className={`px-5 py-2 rounded-full text-sm font-semibold border transition ${
-              activeCategory === tab
-                ? "bg-[#D4AF37] text-white border-[#D4AF37]"
-                : "bg-white border border-[#F3E6C9] text-[#D4AF37] hover:bg-[#FFF8E7]"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="max-w-6xl mx-auto px-6 mt-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 place-items-center">
+          {(showAllCategories ? categories : categories.slice(0, 6)).map((tab) => (
+            <motion.button
+              key={tab}
+              onClick={() => toggleCategory(tab)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`w-full px-4 py-2 rounded-lg text-xs md:text-sm font-semibold border transition flex items-center justify-center gap-2 ${
+                selectedCategories.includes(tab) || (tab === "All" && selectedCategories.length === 0)
+                  ? "bg-[#D4AF37] text-white border-[#D4AF37] shadow-md"
+                  : "bg-white border border-[#F3E6C9] text-[#D4AF37] hover:bg-[#FFF8E7]"
+              }`}
+            >
+              <span>{tab}</span>
+            </motion.button>
+          ))}
+        </div>
+        {!showAllCategories && categories.length > 6 && (
+          <div className="text-center mt-6">
+            <motion.button
+              onClick={() => setShowAllCategories(true)}
+              whileHover={{ scale: 1.05 }}
+              className="px-6 py-2 bg-[#D4AF37] text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition"
+            >
+              View More →
+            </motion.button>
+          </div>
+        )}
+        {showAllCategories && categories.length > 6 && (
+          <div className="text-center mt-6">
+            <motion.button
+              onClick={() => setShowAllCategories(false)}
+              whileHover={{ scale: 1.05 }}
+              className="px-6 py-2 bg-[#D4AF37] text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition"
+            >
+              View Less ←
+            </motion.button>
+          </div>
+        )}
       </div>
 
       {/* FILTER & RESULTS SECTION */}
@@ -257,18 +373,32 @@ export default function FindTalentPage() {
             />
           </div>
 
-          <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
+          <label className="block text-sm font-medium text-[#6B6B6B] mb-2">
             Role Type
           </label>
-          <select 
-            value={activeCategory}
-            onChange={(e) => setActiveCategory(e.target.value)}
-            className="w-full mb-3 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
-          >
+          <div className="space-y-2 mb-3 max-h-48 overflow-y-auto">
             {categories.map((role) => (
-              <option key={role} value={role}>{role}</option>
+              <label key={role} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedRoleTypes.includes(role)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedRoleTypes((prev) => [...prev, role]);
+                    } else {
+                      setSelectedRoleTypes((prev) =>
+                        prev.filter((r) => r !== role)
+                      );
+                    }
+                  }}
+                  className="w-4 h-4 accent-[#D4AF37] rounded"
+                />
+                <span className="text-sm text-[#6B6B6B] hover:text-[#D4AF37]">
+                  {role}
+                </span>
+              </label>
             ))}
-          </select>
+          </div>
 
           <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
             Location
@@ -315,6 +445,102 @@ export default function FindTalentPage() {
             />
           </div>
 
+          <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
+            Height (cm)
+          </label>
+          <div className="flex gap-2 mb-3">
+            <input
+              type="number"
+              placeholder="Min"
+              value={heightRange.min}
+              onChange={(e) => setHeightRange({ ...heightRange, min: e.target.value })}
+              className="w-1/2 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:ring-2 focus:ring-[#D4AF37]"
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              value={heightRange.max}
+              onChange={(e) => setHeightRange({ ...heightRange, max: e.target.value })}
+              className="w-1/2 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:ring-2 focus:ring-[#D4AF37]"
+            />
+          </div>
+
+          <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
+            Weight (kg)
+          </label>
+          <div className="flex gap-2 mb-3">
+            <input
+              type="number"
+              placeholder="Min"
+              value={weightRange.min}
+              onChange={(e) => setWeightRange({ ...weightRange, min: e.target.value })}
+              className="w-1/2 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:ring-2 focus:ring-[#D4AF37]"
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              value={weightRange.max}
+              onChange={(e) => setWeightRange({ ...weightRange, max: e.target.value })}
+              className="w-1/2 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:ring-2 focus:ring-[#D4AF37]"
+            />
+          </div>
+
+          {selectedCategories.length > 0 && (
+            <>
+              <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
+                Specialty / Genre
+              </label>
+              <select
+                value={specialty}
+                onChange={(e) => setSpecialty(e.target.value)}
+                className="w-full mb-3 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              >
+                <option value="">Any</option>
+                {Array.from(
+                  new Set(
+                    selectedCategories.flatMap(
+                      (cat) => specialtyOptions[cat] || []
+                    )
+                  )
+                ).map((spec) => (
+                  <option key={spec} value={spec}>
+                    {spec}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
+
+          <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
+            Experience Level
+          </label>
+          <select
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+            className="w-full mb-3 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+          >
+            <option value="">Any</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+            <option value="Professional">Professional</option>
+          </select>
+
+          <label className="block text-sm font-medium text-[#6B6B6B] mb-1">
+            Availability
+          </label>
+          <select
+            value={availability}
+            onChange={(e) => setAvailability(e.target.value)}
+            className="w-full mb-3 p-2 rounded-lg border border-[#F3E6C9] bg-white focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+          >
+            <option value="">Any</option>
+            <option value="Available Now">Available Now</option>
+            <option value="1-3 Months">1-3 Months</option>
+            <option value="Flexible">Flexible</option>
+            <option value="Not Available">Not Available</option>
+          </select>
+
           {/* FILTER CHIPS */}
           <h3 className="text-sm font-medium text-[#6B6B6B] mb-2 mt-4">
             Quick Filters
@@ -341,7 +567,7 @@ export default function FindTalentPage() {
               onClick={applyFilters}
               className="bg-[#D4AF37] text-white py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition"
             >
-              Apply Filters
+              View Results
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.03 }}
