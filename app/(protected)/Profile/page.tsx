@@ -4,11 +4,15 @@ import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
 import { getUserProfile, getProfileStats, getProfileHighlights } from "../../Actions/profile";
 import ProfileClient from "./ProfileClient";
+import EditableProfileClient from "../../Components/EditableProfileClient";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ searchParams }: { searchParams: { userId?: string } }) {
   // Get the current user session
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
+  const currentUserId = (session?.user as any)?.id;
+  
+  // Use the userId from query params if provided, otherwise use current user's ID
+  const userId = searchParams.userId || currentUserId;
 
   // Safety check
   if (!userId) {
@@ -51,11 +55,18 @@ export default async function ProfilePage() {
     ? statsResult.data 
     : { gigCount: 0, auditionsCount: 0, portfolioCount: 0, connectionsCount: 0 };
   const highlights = highlightsResult.success && highlightsResult.data ? highlightsResult.data : [];
+  
+  // Determine if the current user is viewing their own profile
+  const isOwnProfile = currentUserId === userId;
 
   return (
     <main>
       <Navbar />
-      <ProfileClient user={user} stats={stats} highlights={highlights} />
+      {isOwnProfile ? (
+        <EditableProfileClient user={user} stats={stats} highlights={highlights} />
+      ) : (
+        <ProfileClient user={user} stats={stats} highlights={highlights} isOwnProfile={false} />
+      )}
       <Footer />
     </main>
   );

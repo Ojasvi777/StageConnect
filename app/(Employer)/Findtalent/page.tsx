@@ -617,82 +617,81 @@ export default function FindTalentPage() {
           {/* PROFILE CARDS */}
           <div className="space-y-4">
             {!loading && talents.map((talent) => (
-              <motion.div
-                key={talent.user_id}
-                whileHover={{ y: -5 }}
-                className="bg-white border border-[#F3E6C9] rounded-2xl p-5 flex gap-5 items-start shadow-sm hover:shadow-md transition"
-              >
-                <Image
-                  src={getProfileImage(talent)}
-                  alt={getDisplayName(talent)}
-                  width={96}
-                  height={96}
-                  className="w-24 h-24 object-cover rounded-xl border border-[#F3E6C9] flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-xl font-semibold text-[#2E2E2E] truncate">
-                    {getDisplayName(talent)}
-                  </h3>
-                  <p className="text-[#D4AF37] font-medium">
-                    {getCategoryDisplay(talent.talent_category)}
-                  </p>
-                  
-                  {talent.address && (
-                    <div className="flex items-center gap-2 text-[#6B6B6B] mt-1">
-                      <MapPin className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{talent.address}</span>
-                    </div>
-                  )}
-
-                  {talent.bio && (
-                    <p className="text-[#6B6B6B] text-sm mt-2 line-clamp-2">
-                      {talent.bio}
+              <Link key={talent.user_id} href={`/Profile?userId=${talent.user_id}`}>
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="bg-white border border-[#F3E6C9] rounded-2xl p-5 flex gap-5 items-start shadow-sm hover:shadow-md transition cursor-pointer"
+                >
+                  <Image
+                    src={getProfileImage(talent)}
+                    alt={getDisplayName(talent)}
+                    width={96}
+                    height={96}
+                    className="w-24 h-24 object-cover rounded-xl border border-[#F3E6C9] flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl font-semibold text-[#2E2E2E] truncate">
+                      {getDisplayName(talent)}
+                    </h3>
+                    <p className="text-[#D4AF37] font-medium">
+                      {getCategoryDisplay(talent.talent_category)}
                     </p>
-                  )}
+                    
+                    {talent.address && (
+                      <div className="flex items-center gap-2 text-[#6B6B6B] mt-1">
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">{talent.address}</span>
+                      </div>
+                    )}
 
-                  {/* Portfolio Media Icons */}
-                  {talent.user.portfolioItems && talent.user.portfolioItems.length > 0 && (
-                    <div className="flex gap-2 mt-3">
-                      {talent.user.portfolioItems.slice(0, 3).map((item) => (
-                        <span key={item.portfolio_id} title={item.media_type}>
-                          {item.media_type === "image" && "📷"}
-                          {item.media_type === "video" && "🎥"}
-                          {item.media_type === "audio" && "🎵"}
-                          {item.media_type === "document" && "📄"}
+                    {talent.bio && (
+                      <p className="text-[#6B6B6B] text-sm mt-2 line-clamp-2">
+                        {talent.bio}
+                      </p>
+                    )}
+
+                    {/* Portfolio Media Icons */}
+                    {talent.user.portfolioItems && talent.user.portfolioItems.length > 0 && (
+                      <div className="flex gap-2 mt-3">
+                        {talent.user.portfolioItems.slice(0, 3).map((item) => (
+                          <span key={item.portfolio_id} title={item.media_type}>
+                            {item.media_type === "image" && "📷"}
+                            {item.media_type === "video" && "🎥"}
+                            {item.media_type === "audio" && "🎵"}
+                            {item.media_type === "document" && "📄"}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Additional Info */}
+                    <div className="flex flex-wrap gap-2 mt-2 text-xs text-[#6B6B6B]">
+                      {talent.age && (
+                        <span className="px-2 py-1 bg-[#FFF8E7] rounded">
+                          Age: {talent.age}
                         </span>
-                      ))}
+                      )}
+                      {talent.hourly_rate && (
+                        <span className="px-2 py-1 bg-[#FFF8E7] rounded">
+                          ₹{talent.hourly_rate}/hr
+                        </span>
+                      )}
+                      {talent.gig_count > 0 && (
+                        <span className="px-2 py-1 bg-[#FFF8E7] rounded">
+                          {talent.gig_count} gig{talent.gig_count !== 1 ? 's' : ''}
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {/* Additional Info */}
-                  <div className="flex flex-wrap gap-2 mt-2 text-xs text-[#6B6B6B]">
-                    {talent.age && (
-                      <span className="px-2 py-1 bg-[#FFF8E7] rounded">
-                        Age: {talent.age}
-                      </span>
-                    )}
-                    {talent.hourly_rate && (
-                      <span className="px-2 py-1 bg-[#FFF8E7] rounded">
-                        ₹{talent.hourly_rate}/hr
-                      </span>
-                    )}
-                    {talent.gig_count > 0 && (
-                      <span className="px-2 py-1 bg-[#FFF8E7] rounded">
-                        {talent.gig_count} gig{talent.gig_count !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                  </div>
-
-                  <Link href={`/Profile?userId=${talent.user_id}`}>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       className="mt-4 bg-[#D4AF37] text-white px-4 py-2 rounded-lg font-semibold shadow-sm hover:shadow-md transition"
                     >
                       View Profile
                     </motion.button>
-                  </Link>
-                </div>
-              </motion.div>
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </section>

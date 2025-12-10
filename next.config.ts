@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
         hostname: '*.amazonaws.com', // For S3 URLs
       },
       {

@@ -18,9 +18,10 @@ interface ProfileClientProps {
     description: string;
     type: "portfolio" | "achievement";
   }>;
+  isOwnProfile: boolean;
 }
 
-export default function ProfileClient({ user, stats, highlights }: ProfileClientProps) {
+export default function ProfileClient({ user, stats, highlights, isOwnProfile }: ProfileClientProps) {
   const profile = user.profile;
   const fullName = profile?.first_name && profile?.last_name 
     ? `${profile.first_name} ${profile.last_name}` 
@@ -74,12 +75,22 @@ export default function ProfileClient({ user, stats, highlights }: ProfileClient
         </div>
 
         <div className="flex flex-wrap justify-center md:justify-end gap-3">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="bg-[#D4AF37] text-white px-6 py-2 rounded-full font-semibold shadow-sm hover:shadow-md transition"
-          >
-            Follow
-          </motion.button>
+          {!isOwnProfile && (
+            <>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                className="bg-[#D4AF37] text-white px-6 py-2 rounded-full font-semibold shadow-sm hover:shadow-md transition"
+              >
+                Follow
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                className="bg-white border border-[#D4AF37] text-[#D4AF37] px-6 py-2 rounded-full font-semibold hover:bg-[#FFF8E7] transition"
+              >
+                Message
+              </motion.button>
+            </>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             className="bg-white border border-[#E58BB4] text-[#E58BB4] px-6 py-2 rounded-full font-semibold hover:bg-[#FFF0F5] transition"
@@ -91,12 +102,6 @@ export default function ProfileClient({ user, stats, highlights }: ProfileClient
             className="bg-white border border-[#D4AF37] text-[#D4AF37] px-6 py-2 rounded-full font-semibold hover:bg-[#FFF8E7] transition"
           >
             <Users className="inline-block w-4 h-4 mr-2" />{stats.connectionsCount} Connections
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            className="bg-white border border-[#D4AF37] text-[#D4AF37] px-6 py-2 rounded-full font-semibold hover:bg-[#FFF8E7] transition"
-          >
-            Message
           </motion.button>
           <Link href="/Auditions">
             <motion.button
