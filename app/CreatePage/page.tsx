@@ -56,9 +56,9 @@ export default function CreatePage() {
 
       if (result.success) {
         setSuccess(result.message || "Company registered successfully!");
-        // Redirect to login after 2 seconds
+        // Redirect to Employer Home page after 2 seconds
         setTimeout(() => {
-          router.push("/login");
+          router.push("/Home");
         }, 2000);
       } else {
         setError(result.error || "Failed to register company");

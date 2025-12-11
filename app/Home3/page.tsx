@@ -4,12 +4,11 @@ import Footer from "../Components/Footer";
 import BlogFeed from "../Components/BlogFeed";
 import WriteBlogButton from "../Components/WriteBlogButton";
 import { SessionProvider, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-
-
 import Link from "next/link";
-import { FaHeart, FaRegHeart, FaRegCommentDots, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
+import { FaHeart, FaRegCommentDots, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 
 // Mock data for recently viewed posts
 const recentPosts = [
@@ -48,7 +47,7 @@ const recentPosts = [
     author: "Arjun Kapoor",
     role: "Model",
     avatar: "https://i.pravatar.cc/150?img=15",
-    content: "Behind the scenes from yesterday's fashion shoot �",
+    content: "Behind the scenes from yesterday's fashion shoot 📸",
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400",
     likes: 312,
     comments: 42,
@@ -87,12 +86,75 @@ const appliedGigs = [
 ];
 
 function HomeContent() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [newBlog, setNewBlog] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkUserRole() {
+      if (status === "loading") {
+        return;
+      }
+
+      if (!session?.user) {
+        setLoading(false);
+        return;
+      }
+
+      const userId = (session.user as any)?.id;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/user/role?userId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setUserRole(data.role);
+          
+          // Redirect employers to their dashboard
+          if (data.role === "employer") {
+            router.push("/(Employer)/Home");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkUserRole();
+  }, [session, status, router]);
 
   const handleBlogCreated = (blog: any) => {
     setNewBlog(blog);
   };
+
+  // Show loading state while checking role
+  if (status === "loading" || loading) {
+    return (
+      <div className="bg-gradient-to-b from-[#FFF7DF] to-white min-h-screen">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[400px] mt-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#D4AF37] mx-auto mb-4"></div>
+            <p className="text-[#6B6B6B] text-lg">Loading your dashboard...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Don't render talent home if user is employer (they'll be redirected)
+  if (userRole === "employer") {
+    return null;
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
