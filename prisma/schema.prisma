@@ -94,6 +94,7 @@ model User {
   name           String?
   email          String          @unique
   emailVerified  DateTime?
+  password       String?         // For credential-based authentication
   image          String?         @db.VarChar(512) // S3 URL for profile picture
   accounts       Account[]
   sessions       Session[]
@@ -180,10 +181,26 @@ model Profile {
   company_name         String? @db.VarChar(255)
   company_description  String?
   industry             String? @db.VarChar(100)
+  company_size         String? @db.VarChar(50) // e.g., "1-10", "11-50", etc.
   website              String? @db.VarChar(255)
   contact_person_name  String? @db.VarChar(200)
   contact_person_email String? @db.VarChar(255)
+  contact_person_role  String? @db.VarChar(200)
   company_logo_url     String? @db.VarChar(512) // S3 URL for company logo
+  
+  // Company address fields
+  company_address      String? @db.VarChar(255)
+  company_city         String? @db.VarChar(100)
+  company_state        String? @db.VarChar(100)
+  company_country      String? @db.VarChar(100)
+  company_zip_code     String? @db.VarChar(20)
+  
+  // Legal information
+  registration_number  String? @db.VarChar(100)
+  tax_id               String? @db.VarChar(100)
+  
+  // Verification status
+  is_verified          Boolean @default(false)
 
   created_at DateTime @default(now()) @db.Timestamptz
   updated_at DateTime @updatedAt @db.Timestamptz
