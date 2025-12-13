@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
-import { FaBuilding, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe, FaUsers, FaIndustry } from "react-icons/fa";
+import { FaBuilding, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe, FaIndustry } from "react-icons/fa";
 import { registerCompany } from "../Actions/company";
 
 export default function CreatePage() {

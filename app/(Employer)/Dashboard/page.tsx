@@ -31,19 +31,35 @@ interface CompanyAnalytics {
     type: string;
     title: string;
     date: Date;
-    metadata?: any;
+    metadata?: {
+      status?: string;
+      [key: string]: unknown;
+    };
   }[];
+}
+
+interface Job {
+  job_id: string;
+  title: string;
+  location: string;
+  status: string;
+  description: string;
+  city?: string;
+  state?: string;
+  applicationCount?: number;
+  newApplications?: number;
+  posted_at: string | Date;
 }
 
 export default function EmployerHome() {
   const { data: session } = useSession();
   const [analytics, setAnalytics] = useState<CompanyAnalytics | null>(null);
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
-      const userId = (session?.user as any)?.id;
+      const userId = (session?.user as { id: string })?.id;
       if (!userId) {
         setLoading(false);
         return;
@@ -393,7 +409,7 @@ export default function EmployerHome() {
                               <FaFileAlt className="text-[#D4AF37]" />
                               {job.applicationCount} applications
                             </span>
-                            {job.newApplications > 0 && (
+                            {(job.newApplications ?? 0) > 0 && (
                               <span className="bg-red-500 text-white px-2 py-1 rounded-full font-bold shadow-sm">
                                 {job.newApplications} new
                               </span>

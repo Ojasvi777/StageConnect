@@ -1,8 +1,8 @@
 "use server";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { prisma } from "@/lib/prisma";
 import { JobStatus, JobType, LocationType, TalentCategory } from "./enums";
-import { revalidatePath } from "next/cache";
 
 /**
  * Get all active jobs

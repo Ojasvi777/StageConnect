@@ -1,15 +1,16 @@
 "use client";
+
 import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
 import BlogFeed from "../../Components/BlogFeed";
 import WriteBlogButton from "../../Components/WriteBlogButton";
 import { SessionProvider, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 
 import Link from "next/link";
-import { FaHeart, FaRegHeart, FaRegCommentDots, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
+import { FaHeart, FaRegCommentDots, FaMapMarkerAlt } from "react-icons/fa";
 
 // Mock data for recently viewed posts
 const recentPosts = [
@@ -88,8 +89,10 @@ const appliedGigs = [
 
 function HomeContent() {
   const { data: session } = useSession();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [newBlog, setNewBlog] = useState<any>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleBlogCreated = (blog: any) => {
     setNewBlog(blog);
   };

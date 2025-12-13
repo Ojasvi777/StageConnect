@@ -11,29 +11,29 @@ import { getAllTalentProfiles, getTalentsByCategory } from "../../Actions/talent
 import { TalentCategory } from "../../Actions/enums";
 import type { TalentProfile } from "../../Actions/types";
 
-export default function FindTalentPage() {
-  const categoryMapping: Record<string, TalentCategory | null> = {
-    "All": null,
-    "Actors & Performers": TalentCategory.actor,
-    "Singers": TalentCategory.singer,
-    "Dancers": TalentCategory.dancer,
-    "Models": TalentCategory.model,
-    "Voiceover Artists": TalentCategory.voice_artist,
-    "Crew": null, // Add to enum if needed
-    "Content Creators": null,
-    "Photographers": null,
-    "Fashion Designers": null,
-    "Makeup Artists": null,
-    "Writers": null,
-    "Directors": null,
-    "Producers": null,
-    "Choreographers": null,
-    "Casting Directors": null,
-    "Musicians": TalentCategory.musician,
-    "Comedians": null,
-  };
+const CATEGORY_MAPPING: Record<string, TalentCategory | null> = {
+  "All": null,
+  "Actors & Performers": TalentCategory.actor,
+  "Singers": TalentCategory.singer,
+  "Dancers": TalentCategory.dancer,
+  "Models": TalentCategory.model,
+  "Voiceover Artists": TalentCategory.voice_artist,
+  "Crew": null,
+  "Content Creators": null,
+  "Photographers": null,
+  "Fashion Designers": null,
+  "Makeup Artists": null,
+  "Writers": null,
+  "Directors": null,
+  "Producers": null,
+  "Choreographers": null,
+  "Casting Directors": null,
+  "Musicians": TalentCategory.musician,
+  "Comedians": null,
+};
 
-  const categories = Object.keys(categoryMapping);
+export default function FindTalentPage() {
+  const categories = Object.keys(CATEGORY_MAPPING);
 
   const specialtyOptions: Record<string, string[]> = {
     "Singers": ["Classical", "Pop", "Hip Hop", "Jazz", "R&B", "Folk", "Rock", "Indie", "Bollywood"],
@@ -126,7 +126,7 @@ export default function FindTalentPage() {
         } else {
           // Fetch talents for each selected category and combine
           const talentPromises = selectedCategories.map(async (cat) => {
-            const selectedCategory = categoryMapping[cat];
+            const selectedCategory = CATEGORY_MAPPING[cat];
             if (selectedCategory) {
               return await getTalentsByCategory(selectedCategory);
             }
@@ -270,6 +270,7 @@ export default function FindTalentPage() {
     if (allTalents.length > 0) {
       applyFilters();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   const getProfileImage = (talent: TalentProfile) => {

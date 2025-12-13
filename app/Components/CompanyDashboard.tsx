@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -11,8 +12,6 @@ import {
   FaChartLine,
   FaUserCheck,
   FaClock,
-  FaCheckCircle,
-  FaTimesCircle,
 } from "react-icons/fa";
 import { getCompanyAnalytics, getCompanyJobs } from "../Actions/analytics";
 import Link from "next/link";

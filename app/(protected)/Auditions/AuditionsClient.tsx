@@ -2,13 +2,14 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Briefcase, TrendingUp, AlertCircle } from "lucide-react";
+import { Calendar, MapPin, Briefcase, TrendingUp } from "lucide-react";
 import { withdrawAudition, deleteAudition } from "../../Actions/auditions";
 import { useRouter } from "next/navigation";
 
 type AuditionStatus = "submitted" | "under_review" | "shortlisted" | "audition_scheduled" | "selected" | "rejected" | "withdrawn";
 
-type AuditionData = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface AuditionData {
   audition_id: string;
   status: AuditionStatus;
   submitted_at: Date;
@@ -21,8 +22,8 @@ type AuditionData = {
     location_type: string;
     city: string | null;
     event_date: Date | null;
-    compensation_min: any;
-    compensation_max: any;
+    compensation_min: number | null | { toNumber?: () => number };
+    compensation_max: number | null | { toNumber?: () => number };
     profile: {
       company_name: string | null;
       contact_person_name: string | null;
@@ -36,7 +37,7 @@ type AuditionData = {
     media_url: string;
     media_type: string;
   } | null;
-};
+}
 
 type Stats = {
   total: number;
@@ -47,11 +48,13 @@ export function AuditionsClient({
   initialAuditions, 
   initialStats 
 }: { 
-  initialAuditions: AuditionData[];
-  initialStats: Stats;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialAuditions: any[];
+  initialStats: Stats | undefined;
 }) {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>("All");
+  const stats = initialStats || { total: 0, byStatus: {} };
 
   const handleWithdraw = async (auditionId: string) => {
     if (!confirm("Are you sure you want to withdraw this audition?")) return;
@@ -115,13 +118,14 @@ export function AuditionsClient({
     });
   };
 
-  const formatCurrency = (amount: any) => {
+  const formatCurrency = (amount: number | null | undefined | { toNumber?: () => number }) => {
     if (!amount) return "N/A";
+    const numAmount = typeof amount === 'object' && 'toNumber' in amount ? amount.toNumber?.() ?? 0 : Number(amount);
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,
-    }).format(Number(amount));
+    }).format(numAmount);
   };
 
   return (
@@ -131,7 +135,7 @@ export function AuditionsClient({
         <div>
           <h1 className="text-4xl font-extrabold text-[#2E2E2E]">🎭 My Auditions</h1>
           <p className="text-[#6B6B6B] mt-2">
-            Total: {initialStats.total} auditions
+            Total: {stats.total} auditions
           </p>
         </div>
         <div className="flex gap-4 mt-4 md:mt-0">
@@ -162,7 +166,7 @@ export function AuditionsClient({
             <Briefcase className="w-8 h-8 text-[#D4AF37]" />
             <div>
               <p className="text-sm text-[#6B6B6B]">Total</p>
-              <p className="text-2xl font-bold text-[#2E2E2E]">{initialStats.total}</p>
+              <p className="text-2xl font-bold text-[#2E2E2E]">{stats.total}</p>
             </div>
           </div>
         </motion.div>
@@ -176,7 +180,7 @@ export function AuditionsClient({
             <div>
               <p className="text-sm text-[#6B6B6B]">Pending</p>
               <p className="text-2xl font-bold text-[#2E2E2E]">
-                {(initialStats.byStatus?.submitted || 0) + (initialStats.byStatus?.under_review || 0)}
+                {(stats.byStatus?.submitted || 0) + (stats.byStatus?.under_review || 0)}
               </p>
             </div>
           </div>
@@ -191,7 +195,7 @@ export function AuditionsClient({
             <div>
               <p className="text-sm text-[#6B6B6B]">Scheduled</p>
               <p className="text-2xl font-bold text-[#2E2E2E]">
-                {initialStats.byStatus?.audition_scheduled || 0}
+                {stats.byStatus?.audition_scheduled || 0}
               </p>
             </div>
           </div>
@@ -208,7 +212,7 @@ export function AuditionsClient({
             <div>
               <p className="text-sm text-[#6B6B6B]">Selected</p>
               <p className="text-2xl font-bold text-[#2E2E2E]">
-                {initialStats.byStatus?.selected || 0}
+                {stats.byStatus?.selected || 0}
               </p>
             </div>
           </div>
@@ -222,7 +226,7 @@ export function AuditionsClient({
             <p className="text-xl text-[#6B6B6B]">
               {statusFilter === "All" 
                 ? "No auditions yet. Start applying to jobs!" 
-                : `No auditions with status: ${formatStatus(statusFilter as any)}`
+                : `No auditions with status: ${formatStatus(statusFilter as AuditionStatus)}`
               }
             </p>
           </div>

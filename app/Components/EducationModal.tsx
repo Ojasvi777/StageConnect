@@ -9,6 +9,7 @@ interface EducationModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   education?: any; // For editing existing education
 }
 

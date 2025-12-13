@@ -8,7 +8,7 @@ import { AuditionsClient } from "./AuditionsClient";
 export default async function AuditionsPage() {
   // No need to check auth here - the (protected) layout already handles it
   const session = await getServerSession(authOptions);
-  const userId = (session?.user as any)?.id;
+  const userId = (session?.user as { id: string })?.id;
 
   // Safety check (should never happen due to layout protection)
   if (!userId) {
@@ -51,7 +51,7 @@ export default async function AuditionsPage() {
   return (
     <main>
       <Navbar />
-      <AuditionsClient initialAuditions={auditions as any} initialStats={stats as any} />
+      <AuditionsClient initialAuditions={auditions} initialStats={stats} />
       <Footer />
     </main>
   );

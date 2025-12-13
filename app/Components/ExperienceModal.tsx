@@ -9,7 +9,8 @@ interface ExperienceModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: string;
-  experience?: any; // For editing existing experience
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  experience?: any;
 }
 
 export default function ExperienceModal({ isOpen, onClose, userId, experience }: ExperienceModalProps) {

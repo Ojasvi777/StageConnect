@@ -6,13 +6,20 @@ import { getUserProfile, getProfileStats, getProfileHighlights } from "../../Act
 import ProfileClient from "./ProfileClient";
 import EditableProfileClient from "../../Components/EditableProfileClient";
 
-export default async function ProfilePage({ searchParams }: { searchParams: { userId?: string } }) {
+export default async function ProfilePage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ userId?: string }> 
+}) {
   // Get the current user session
   const session = await getServerSession(authOptions);
-  const currentUserId = (session?.user as any)?.id;
+  const currentUserId = (session?.user as { id: string })?.id;
+  
+  // Await searchParams in Next.js 15
+  const params = await searchParams;
   
   // Use the userId from query params if provided, otherwise use current user's ID
-  const userId = searchParams.userId || currentUserId;
+  const userId = params.userId || currentUserId;
 
   // Safety check
   if (!userId) {

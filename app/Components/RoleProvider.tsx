@@ -39,6 +39,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userId = (session.user as any)?.id;
         if (!userId) {
           setLoading(false);
