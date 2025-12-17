@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -64,7 +65,7 @@ interface Comment {
 }
 
 export default function BlogClient() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   const [search, setSearch] = useState("");
@@ -90,6 +91,7 @@ export default function BlogClient() {
   // Fetch blogs on mount and when filters change
   useEffect(() => {
     fetchBlogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTag, sortBy]);
 
   const fetchBlogs = async () => {

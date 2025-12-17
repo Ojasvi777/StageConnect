@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin, Mail, Users, Video, Award, MessageCircle, Briefcase, Instagram, Youtube } from "lucide-react";
+import { MapPin, Mail, Users, Video, Briefcase, Instagram, Youtube, Award, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 interface ProfileClientProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user: any;
   stats: {
     gigCount: number;
@@ -69,7 +70,7 @@ export default function ProfileClient({ user, stats, highlights, isOwnProfile }:
           )}
           {profile?.bio && (
             <p className="mt-3 text-[#6B6B6B] italic">
-              "{profile.bio}"
+              &ldquo;{profile.bio}&rdquo;
             </p>
           )}
         </div>
@@ -276,6 +277,7 @@ export default function ProfileClient({ user, stats, highlights, isOwnProfile }:
             <Briefcase className="text-[#D4AF37]" /> Experience
           </h2>
           <div className="space-y-6">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {user.experiences.slice(0, 3).map((exp: any) => (
               <motion.div
                 key={exp.experience_id}
@@ -312,6 +314,7 @@ export default function ProfileClient({ user, stats, highlights, isOwnProfile }:
             <Video className="text-[#D4AF37]" /> Portfolio
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {user.portfolioItems.map((item: any) => (
               <motion.div
                 key={item.portfolio_id}
@@ -367,6 +370,7 @@ export default function ProfileClient({ user, stats, highlights, isOwnProfile }:
         <section className="max-w-5xl mx-auto mt-16 px-6">
           <h2 className="text-2xl font-semibold text-[#D4AF37] mb-6">Education</h2>
           <div className="space-y-6">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {user.educations.slice(0, 3).map((edu: any) => (
               <motion.div
                 key={edu.education_id}
@@ -394,7 +398,7 @@ export default function ProfileClient({ user, stats, highlights, isOwnProfile }:
       {/* CONTACT SECTION */}
       <section className="max-w-5xl mx-auto mt-24 px-6 text-center">
         <h2 className="text-3xl font-semibold text-[#2E2E2E] mb-4">
-          Let's Collaborate 💬
+          Let&apos;s Collaborate 💬
         </h2>
         <p className="text-[#6B6B6B] mb-8">
           Reach out for creative projects, auditions, or partnerships.

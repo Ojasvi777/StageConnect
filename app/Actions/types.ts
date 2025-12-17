@@ -1,5 +1,6 @@
 // Type definitions for server actions responses
 // Using any for now - Prisma types will be properly generated after schema changes
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type AuditionWithDetails = any;
 export type JobWithDetails = any;

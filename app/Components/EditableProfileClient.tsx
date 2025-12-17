@@ -1,8 +1,9 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Users, Video, Award, MessageCircle, Briefcase, Instagram, Youtube, Edit2, Save, X, Plus, Trash2, Loader2 } from "lucide-react";
+import { MapPin, Users, Video, Briefcase, Instagram, Youtube, Edit2, Save, X, Plus, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { updateProfile, deleteExperience, deleteEducation } from "../Actions/profile";
@@ -26,7 +27,7 @@ interface EditableProfileClientProps {
   }>;
 }
 
-export default function EditableProfileClient({ user, stats, highlights }: EditableProfileClientProps) {
+export default function EditableProfileClient({ user, stats }: EditableProfileClientProps) {
   const router = useRouter();
   const profile = user.profile;
   
@@ -637,7 +638,7 @@ export default function EditableProfileClient({ user, stats, highlights }: Edita
             </div>
           ) : (
             <div className="text-center py-8 text-[#6B6B6B]">
-              <p>No experience added yet. Click "Add Experience" to get started.</p>
+              <p>No experience added yet. Click &ldquo;Add Experience&rdquo; to get started.</p>
             </div>
           )}
         </div>
@@ -697,7 +698,7 @@ export default function EditableProfileClient({ user, stats, highlights }: Edita
             </div>
           ) : (
             <div className="text-center py-8 text-[#6B6B6B]">
-              <p>No portfolio items yet. Click "Add Portfolio Item" to showcase your work.</p>
+              <p>No portfolio items yet. Click &ldquo;Add Portfolio Item&rdquo; to showcase your work.</p>
             </div>
           )}
         </div>
@@ -767,7 +768,7 @@ export default function EditableProfileClient({ user, stats, highlights }: Edita
             </div>
           ) : (
             <div className="text-center py-8 text-[#6B6B6B]">
-              <p>No education added yet. Click "Add Education" to get started.</p>
+              <p>No education added yet. Click &ldquo;Add Education&rdquo; to get started.</p>
             </div>
           )}
         </div>

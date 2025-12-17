@@ -1,6 +1,8 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,7 +15,6 @@ import { submitAudition } from "../Actions/auditions";
 import { getUserPortfolio } from "../Actions/portfolio";
 import {
   MapPin,
-  Calendar,
   DollarSign,
   Briefcase,
   Users,
@@ -81,6 +82,7 @@ export default function JobsPage() {
     if (status === "authenticated" && session?.user) {
       loadPortfolio();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, session]);
 
   const loadJobs = async () => {
@@ -182,7 +184,7 @@ export default function JobsPage() {
     return daysUntilDeadline <= 7;
   };
 
-  if (loading) {
+  if (loading || status === "loading") {
     return (
       <main className="min-h-screen bg-gradient-to-b from-[#FFF8E7] via-white to-[#FCE4EC]">
         <Navbar />
@@ -239,9 +241,11 @@ export default function JobsPage() {
               >
                 {/* Company Logo */}
                 {job.profile.company_logo_url && (
-                  <img
+                  <Image
                     src={job.profile.company_logo_url}
                     alt={job.profile.company_name || "Company"}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-lg mb-3 object-cover"
                   />
                 )}

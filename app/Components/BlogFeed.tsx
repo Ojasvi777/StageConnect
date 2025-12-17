@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -65,7 +66,7 @@ interface BlogFeedProps {
 }
 
 export default function BlogFeed({ onNewBlog }: BlogFeedProps) {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   const [search, setSearch] = useState("");
@@ -84,6 +85,7 @@ export default function BlogFeed({ onNewBlog }: BlogFeedProps) {
   // Fetch blogs on mount and when filters change
   useEffect(() => {
     fetchBlogs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTag, sortBy]);
 
   // Add new blog to feed when created
