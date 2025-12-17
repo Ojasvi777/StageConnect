@@ -19,6 +19,9 @@ export default function Page() {
           <Link href="/login" className="hover:text-[#E58BB4] transition">
             Login
           </Link>
+          <Link href="/Feedback" className="hover:text-[#E58BB4] transition">
+            Feedback
+          </Link>
           <Link href="/Findtalent" className="hover:text-[#E58BB4] transition">
             Find Talent
           </Link>

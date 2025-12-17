@@ -93,7 +93,10 @@ const Navbar = () => {
             </ul>
           )}
         </div>
-
+<Link href="/Feedback" className="hover:text-[#f5d787] transition">
+          Feedback
+        </Link>
+        
         <Link href="/Profile" className="hover:text-[#f5d787] transition">
           Profile
         </Link>
